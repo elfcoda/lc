@@ -52,25 +52,19 @@
 class Solution {
 public:
     string convert(string s, int numRows) {
-        if (s.length() < 3 || numRows == 1) return s;
+        int iLen = s.length();
+        if (iLen < 3 || numRows == 1) return s;
 
-        vector<string> vs;
-        for (int i = 0; i < numRows; i++)
-            vs.push_back("");
+        vector<string> vs(numRows, "");
 
-        // init
-        vector<int> m_hash2QueIdx;
-        int iModCount = (numRows - 1) * 2;
-        m_hash2QueIdx.reserve(iModCount + 1);
-        m_hash2QueIdx.resize(iModCount + 1);
-        for (int m = 0; m < iModCount; m++)
+        int k = 0;
+        while (k < iLen)
         {
-            m_hash2QueIdx[m] = (m < numRows) ? m : numRows - (m + 1 - numRows) - 1;
-        }
-
-        for (int k = 0; k < s.length(); k++)
-        {
-            vs[m_hash2QueIdx[(k%iModCount)]].push_back(s[k]);
+            // remove if
+            for (int d = 0; d < numRows && k < iLen; d++)
+                vs[d].push_back(s[k++]);
+            for (int u = numRows - 2; u > 0 && k < iLen; u--)
+                vs[u].push_back(s[k++]);
         }
 
         string sRet = "";
