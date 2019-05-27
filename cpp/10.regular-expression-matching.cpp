@@ -69,85 +69,79 @@
  * Output: true
  * Explanation: c can be repeated 0 times, a can be repeated 1 time. Therefore
  * it matches "aab".
- *
- *
- * Example 5:
- *
- *
- * Input:
- * s = "mississippi"
- * p = "mis*is*p*."
- * Output: false
- *
- *
- */
+*
+*
+* Example 5:
+*
+*
+* Input:
+* s = "mississippi"
+* p = "mis*is*p*."
+* Output: false
+*
+*
+*/
 class Solution {
-public:
-    int sLen;
-    int pLen;
-    string s;
-    string p;
-    bool isMatch(string s, string p) {
-        this->s = s;
-        this->p = p;
-        sLen = s.length();
-        pLen = p.length();
-        return isMat(0, 0);
-    }
+    public:
+        int sLen;
+        int pLen;
+        string s;
+        string p;
+        bool isMatch(string s, string p) {
+            this->s = s;
+            this->p = p;
+            sLen = s.length();
+            pLen = p.length();
 
-    inline bool isRepeat(int idx)
-    {
-        if (idx + 1 < pLen && p[idx + 1] == '*') return true;
-        return false;
-    }
+            // init vector for memorizing
+            vector<vector<bool>> vv(sLen+1, vector<bool>(pLen+1, false));
+            vv[sLen][pLen] = true;
+            for (int i = pLen - 1; i >= 0; i -= 2)
+            {
+                if (p[i] == '*') vv[sLen][i-1] = true;
+                else break;
+            }
 
-    bool isMat(int sIdx, int pIdx)
-    {
-        // p is the end
-        if (pIdx == pLen)
-        {
-            return sIdx == sLen;
+            return isMat(vv);
         }
 
-        // s is the end
-        if (sIdx == sLen)
+        inline bool isRepeat(int idx)
         {
-            int iLeft = pLen - pIdx;
-            if (iLeft % 2 == 0)
+            if (idx + 1 < pLen && p[idx + 1] == '*') return true;
+            return false;
+        }
+
+        bool isMat(vector<vector<bool>>& vv)
+        {
+            int sIdx = sLen - 1, pIdx = pLen - 1;
+            for (int sIdx = sLen - 1; sIdx >= 0; sIdx --)
             {
-                for (int i = 0; i < iLeft / 2; i++)
+                for (int pIdx = pLen - 1; pIdx >= 0; pIdx--)
                 {
-                    if (p[pIdx + (i * 2 + 1)] != '*') return false;
+                    if (p[pIdx] == '*') continue;
+                    else if (p[pIdx] == '.' && !isRepeat(pIdx))
+                    {
+                        vv[sIdx][pIdx] = vv[sIdx + 1][pIdx + 1];
+                    }
+                    else if (p[pIdx] >= 'a' && p[pIdx] <= 'z' && !isRepeat(pIdx))
+                    {
+                        if (s[sIdx] == p[pIdx]) vv[sIdx][pIdx] = vv[sIdx + 1][pIdx + 1];
+                        else vv[sIdx][pIdx] = false;
+                    }
+                    else if (p[pIdx] == '.' && isRepeat(pIdx))
+                    {
+                        // no match || match one
+                        vv[sIdx][pIdx] = vv[sIdx][pIdx + 2] || vv[sIdx + 1][pIdx];
+                    }
+                    else if (p[pIdx] >= 'a' && p[pIdx] <= 'z' && isRepeat(pIdx))
+                    {
+                        // last situation
+                        if (s[sIdx] != p[pIdx]) vv[sIdx][pIdx] = vv[sIdx][pIdx + 2];
+                        else vv[sIdx][pIdx] = vv[sIdx][pIdx + 2] || vv[sIdx + 1][pIdx];
+                    }
                 }
-                return true;
             }
-            else
-            {
-                return false;
-            }
-        }
 
-        if (p[pIdx] == '.' && !isRepeat(pIdx))
-        {
-            return isMat(sIdx+1, pIdx+1);
+            return vv[0][0];
         }
-        else if (p[pIdx] >= 'a' && p[pIdx] <= 'z' && !isRepeat(pIdx))
-        {
-            if (s[sIdx] == p[pIdx]) return isMat(sIdx+1, pIdx+1);
-            else return false;
-        }
-        else if (p[pIdx] == '.' && isRepeat(pIdx))
-        {
-            // no match || match one
-            return isMat(sIdx, pIdx + 2) || isMat(sIdx + 1, pIdx);
-        }
-        else if (p[pIdx] >= 'a' && p[pIdx] <= 'z' && isRepeat(pIdx))
-        {
-            // last situation
-            if (s[sIdx] != p[pIdx]) return isMat(sIdx, pIdx + 2);
-            else return isMat(sIdx, pIdx + 2) || isMat(sIdx + 1, pIdx);
-        }
-
-        return false;
-    }
 };
