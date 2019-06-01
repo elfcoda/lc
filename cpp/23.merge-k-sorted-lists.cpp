@@ -37,32 +37,6 @@
  */
 class Solution {
 public:
-    ListNode* mergeTwo(ListNode* l1, ListNode* l2)
-    {
-        // not null
-        ListNode* head, * p;
-        if (l1->val < l2->val) { head = p = l1; l1 = l1->next; }
-        else { head = p = l2; l2 = l2->next; }
-
-        while (true)
-        {
-            if (l1 == NULL) { p->next = l2; return head; }
-            else if (l2 == NULL) { p->next = l1; return head; }
-            else if (l1->val < l2->val) {
-                p->next = l1;
-                p = p->next;
-                l1 = l1->next;
-            }
-            else {
-                p->next = l2;
-                p = p->next;
-                l2 = l2->next;
-            }
-        }
-
-        return NULL;
-    }
-
     ListNode* mergeKLists(vector<ListNode*>& lists) {
         ListNode* head = NULL, * p = NULL;
         if (lists.size() == 0) return NULL;
