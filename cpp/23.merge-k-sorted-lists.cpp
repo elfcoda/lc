@@ -64,13 +64,35 @@ public:
     }
 
     ListNode* mergeKLists(vector<ListNode*>& lists) {
-        ListNode* head = NULL;
+        ListNode* head = NULL, * p = NULL;
+        if (lists.size() == 0) return NULL;
+        if (lists.size() == 1) return lists[0];
 
+        bool bFlag = false;
+        multiset<int> si;
         for (const auto& it: lists)
         {
             if (it == NULL) continue;
-            if (head == NULL) head = it;
-            else head = mergeTwo(head, it);
+            if (bFlag == false) {
+                bFlag = true;
+                head = it;
+            }
+            if (p) p->next = it;
+            p = it;
+            while (p->next)
+            {
+                si.insert(p->val);
+                p = p->next;
+            }
+            si.insert(p->val);
+        }
+
+        // revalue
+        ListNode* walk = head;
+        for (const auto& i: si)
+        {
+            walk->val = i;
+            walk = walk->next;
         }
 
         return head;
